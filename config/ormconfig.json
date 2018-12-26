@@ -1,0 +1,13 @@
+{
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "123456",
+    "database": "68star",
+    "synchronize": true,
+    "logging": false,
+    "entities": [
+        "bin/entity/*.js"
+    ]
+}
