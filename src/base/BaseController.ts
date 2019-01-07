@@ -67,38 +67,61 @@ export function post() {
 }
 
 
+/**
+ * 控制器方法参数定义类
+ *
+ * @export
+ * @class ActionParamDescriptor
+ */
 export class ActionParamDescriptor {
     public fromType: string;
-    public paramType: string;
+    public verifyObject: VerifyObject;
     public target: any;
     public actionName: string;
     public index: number;
     public paramName: string;
-    constructor(fromType: string, paramType = '', target: any, actionName: string, paramName: string, index: number) {
-        this.fromType = fromType;
-        this.paramType = paramType;
-        this.target = target;
-        this.actionName = actionName;
-        this.paramName = paramName;
-        this.index = index;
-    }
 }
 
-export function fromBody(paramType?: string) {
+/**
+ * 控制器方法参数检测定义类
+ *
+ * @class VerifyObject
+ */
+class VerifyObject {
+    public type: string;
+    public msg: string;
+    public complex: any;
+    public max: number;
+    public min: number;
+    public isRequired: boolean;
+}
+
+export function fromBody(paramType?: any, isRequired?: boolean) {
     return function (target: Object, propertyKey: string, parameterIndex: number) {
-        buildActionParamDes('body', paramType, target, propertyKey, parameterIndex);
+        buildActionParamDes('body', paramType, target, propertyKey, parameterIndex, isRequired);
     }
 }
 
-export function fromQuery(paramType?: string) {
+export function fromQuery(paramType?: any) {
     return function (target: Object, propertyKey: string, parameterIndex: number) {
         buildActionParamDes('query', paramType, target, propertyKey, parameterIndex);
     }
 }
 
-function buildActionParamDes(fromType: string, paramType = '', target: any, actionName: string, index: number) {
+function buildActionParamDes(fromType: string, paramType: any, target: any, actionName: string, index: number, isRequired: boolean = true) {
     let paramName = getArgs(target[actionName], index);
-    let paramDes = new ActionParamDescriptor(fromType, paramType, target, actionName, paramName, index);
+    let paramDes = new ActionParamDescriptor();
+    paramDes.fromType = fromType;
+    paramDes.verifyObject = new VerifyObject();
+    paramDes.verifyObject.isRequired = isRequired;
+    if (typeof paramType === 'string') {
+        paramDes.verifyObject.type = paramType;
+    } else if (typeof paramType === 'object') {
+        paramDes.verifyObject = Object.assign(paramDes.verifyObject, paramType);
+    }
+    paramDes.target = target;
+    paramDes.actionName = actionName;
+    paramDes.index = index;
     SetActionArgsMetaData(paramDes);
 }
 
@@ -110,12 +133,12 @@ function getArgs(action: any, index: number) {
 }
 
 export class ActionDescriptor {
-    public id: string = '';
-    public controllerName: string = '';
-    public actionName: string = '';
-    public method: string = '';
-    public actionAlias: string = '';
-    public routerName: string = '';
+    public id: string;
+    public controllerName: string;
+    public actionName: string;
+    public method: string;
+    public actionAlias: string;
+    public routerName: string;
     public controller: any;
     public action: any;
     public isAuth: boolean = false;

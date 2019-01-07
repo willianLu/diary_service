@@ -15,7 +15,11 @@ namespace UserService {
     export async function saveAsync() {
         let repo = await GetMysqlServiceAsync(User);
         let userInfo = new User();
-        userInfo.userName = 'lu';
+        userInfo.nickName = 'lu';
+        userInfo.avatarUrl = '123';
+        userInfo.openId = '123456';
+        userInfo.phoneNumber = '123456';
+
         return await repo.saveAsync(userInfo);
     }
     export async function saveMultiAsync() {

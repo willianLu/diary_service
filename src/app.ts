@@ -36,6 +36,7 @@ RouterHandle(app, controllers);
 app.use(Router);
 
 app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log(error);
     const xrw = req.header('X-Requested-With') || req.header('x-requested-with');
     if (xrw && xrw.toLowerCase() === 'xmlhttprequest') {
         res.send(error);

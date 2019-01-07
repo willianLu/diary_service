@@ -97,7 +97,7 @@ export function SetActionArgsMetaData(paramDes: ActionParamDescriptor) {
 }
 
 function getActionArgs(req: core.Request, controller: any, actionName: string) {
-    let arr: ActionParamDescriptor[] = Reflect.getMetadata(fromQueryMetadataKey, controller.prototype, actionName);
+    let arr: ActionParamDescriptor[] = Reflect.getMetadata(fromQueryMetadataKey, controller.prototype, actionName) || [];
     let args = [arr.length];
     arr.forEach((element) => {
         args[element.index] = parseParam(req, element.fromType, element.paramName);

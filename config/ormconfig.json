@@ -1,10 +1,10 @@
 {
     "type": "mysql",
-    "host": "localhost",
+    "host": "132.232.52.184",
     "port": 3306,
     "username": "root",
-    "password": "123456",
-    "database": "68star",
+    "password": "aa172854.",
+    "database": "diary",
     "synchronize": true,
     "logging": false,
     "entities": [
