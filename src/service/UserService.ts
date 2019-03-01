@@ -2,6 +2,22 @@ import { GetMysqlServiceAsync } from '../base/SqlService';
 import { FindManyOptions, FindOneOptions, FindConditions, EntityManager } from 'typeorm';
 import { User, Menu } from '../entity';
 namespace UserService {
+
+    export async function execLoginAndCreateUse(res: any) {
+        let repo = await GetMysqlServiceAsync(User);
+        let userInfo = await repo.findAsync({
+            where: {
+                openId: res.openid
+            }
+        });
+        if (userInfo[0] && userInfo[0].id) {
+            return userInfo[0];
+        }
+        let user = new User();
+        user.openId = res.openid;
+        return await repo.saveAsync(user);
+    }
+
     export async function getUserInfoAsync() {
         let repo = await GetMysqlServiceAsync(User);
         let ids = ['411debf1-0732-11e9-aef7-61e449b6b2ae', '43f34670-080b-11e9-939c-99b5e4ed02f8'];

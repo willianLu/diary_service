@@ -7,18 +7,21 @@ export class User extends BaseEntity {
     @Column({ nullable: true })
     userName: string;
 
+    @Column({ nullable: true })
+    sex: string;
+
     @Column({ default: 0 })
     age: number;
 
-    @Column()
+    @Column({ nullable: true })
     nickName: string;
 
-    @Column()
+    @Column({ nullable: true })
     avatarUrl: string;
+
+    @Column({ nullable: true })
+    phoneNumber: string;
 
     @Column()
     openId: string;
-
-    @Column()
-    phoneNumber: string;
 }

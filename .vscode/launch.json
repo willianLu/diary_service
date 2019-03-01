@@ -7,9 +7,9 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "启动程序",
-            "program": "${workspaceFolder}\\bin\\app.js",
-            "preLaunchTask": "debugger buiding"
+            "name": "Launch Program",
+            "program": "${workspaceRoot}\\bin\\app.js",
+            // "preLaunchTask": "debugger buiding"
         }
     ]
 }

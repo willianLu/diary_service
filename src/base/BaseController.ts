@@ -1,5 +1,5 @@
 import * as core from 'express-serve-static-core';
-import { SetActionArgsMetaData } from './RouterHandle';
+import { SetActionArgsMetaData, SetActionLogicMetaData } from './RouterHandle';
 
 export class BaseController {
     public Request: core.Request;
@@ -14,7 +14,7 @@ export class BaseController {
     custom(msg = '', data = {}, resCode: number) {
         return new ResponseBase(resCode, msg, data);
     }
-    success(msg = '', data = {}) {
+    success(data = {}, msg = '') {
         return new ResponseBase(200, msg, data);
     }
     fail(msg = '', data = {}, resCode = 6000) {
@@ -75,50 +75,55 @@ export function post() {
  */
 export class ActionParamDescriptor {
     public fromType: string;
-    public verifyObject: VerifyObject;
     public target: any;
     public actionName: string;
     public index: number;
     public paramName: string;
 }
 
+
 /**
- * 控制器方法参数检测定义类
+ * 数据验证对象
  *
- * @class VerifyObject
+ * @export
+ * @class LogicParam
  */
-class VerifyObject {
-    public type: string;
-    public msg: string;
-    public complex: any;
-    public max: number;
-    public min: number;
-    public isRequired: boolean;
+export class LogicParam {
+    rules?: any;
+    msg?: any;
+    type?: string;
 }
 
-export function fromBody(paramType?: any, isRequired?: boolean) {
-    return function (target: Object, propertyKey: string, parameterIndex: number) {
-        buildActionParamDes('body', paramType, target, propertyKey, parameterIndex, isRequired);
+export function logic(rules: LogicParam = {}) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        SetActionLogicMetaData(target, propertyKey, rules);
     }
 }
 
-export function fromQuery(paramType?: any) {
+export function fromBody() {
     return function (target: Object, propertyKey: string, parameterIndex: number) {
-        buildActionParamDes('query', paramType, target, propertyKey, parameterIndex);
+        buildActionParamDes('body', target, propertyKey, parameterIndex);
     }
 }
 
-function buildActionParamDes(fromType: string, paramType: any, target: any, actionName: string, index: number, isRequired: boolean = true) {
+export function fromQuery() {
+    return function (target: Object, propertyKey: string, parameterIndex: number) {
+        buildActionParamDes('query', target, propertyKey, parameterIndex);
+    }
+}
+
+function buildActionParamDes(fromType: string, target: any, actionName: string, index: number) {
     let paramName = getArgs(target[actionName], index);
     let paramDes = new ActionParamDescriptor();
+    paramDes.paramName = paramName;
     paramDes.fromType = fromType;
-    paramDes.verifyObject = new VerifyObject();
-    paramDes.verifyObject.isRequired = isRequired;
-    if (typeof paramType === 'string') {
-        paramDes.verifyObject.type = paramType;
-    } else if (typeof paramType === 'object') {
-        paramDes.verifyObject = Object.assign(paramDes.verifyObject, paramType);
-    }
+    // paramDes.verifyObject = new VerifyObject();
+    // paramDes.verifyObject.isRequired = isRequired;
+    // if (typeof paramType === 'string') {
+    //     paramDes.verifyObject.type = paramType;
+    // } else if (typeof paramType === 'object') {
+    //     paramDes.verifyObject = Object.assign(paramDes.verifyObject, paramType);
+    // }
     paramDes.target = target;
     paramDes.actionName = actionName;
     paramDes.index = index;
@@ -182,7 +187,6 @@ export function SetActionDescriptorMap(controllerName: string, actionName: strin
     actionName = actionMap.actionAlias || actionMap.actionName;
     actionMap.id += actionName ? '_' + actionName : '';
     actionMap.id += actionMap.method ? '_' + actionMap.method : '';
-    // console.log(ActionDescriptorMap);
 }
 
 export function GetActionDescriptorMap(routerName: string, actionName: string, method: string) {
