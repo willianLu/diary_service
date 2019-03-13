@@ -40,7 +40,12 @@ app.use(Router);
 app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
     const xrw = req.header('X-Requested-With') || req.header('x-requested-with');
     if (xrw && xrw.toLowerCase() === 'xmlhttprequest') {
-        res.send(error);
+        let status = (error as any).status || 500;
+        res.status(status).send({
+            resCode: status,
+            msg: error.message,
+            data: {}
+        });
     } else {
         res.render('error.html', { status: (error as any).status, message: error.message }, (err, html) => {
             if (err) {

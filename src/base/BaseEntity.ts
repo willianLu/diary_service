@@ -9,7 +9,7 @@ import uuid from 'uuid';
 @Entity()
 export class BaseEntity {
     constructor() {
-        this.id = uuid.v1();
+        this.id = uuid.v1().replace(/-/g, '');
     }
     /**
      * 数据库id主键

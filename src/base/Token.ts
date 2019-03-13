@@ -1,15 +1,14 @@
 import crypto from 'crypto';
 
 class Token {
-    key: '68star.cn';
-    iv = '';
+    key = Buffer.from('ke_www.68star.cn', 'utf8');
+    iv = Buffer.from('iv_www.68star.cn', 'utf8');
 
     ParseToken(token: string) {
         var desToken = this.decryption(token);
         var arr = desToken.split('|');
         if (arr.length == 4) {
-
-            return { AccessToken: arr[0], UserId: arr[1], lastTime: new Date(parseInt(arr[2])), expires: (arr[3] == "0" ? undefined : new Date(parseInt(arr[3]))) }
+            return { userId: arr[0], openId: arr[1], lastTime: new Date(parseInt(arr[2])), expires: (arr[3] == "0" ? undefined : new Date(parseInt(arr[3]))) }
         }
         return undefined;
     }
@@ -21,7 +20,7 @@ class Token {
 
     private encryption(data: string) {
         let cipherChunks = [];
-        let cipher = crypto.createCipheriv('aes-128-ecb', this.key, this.iv);
+        let cipher = crypto.createCipheriv('aes-128-cbc', this.key, this.iv);
         cipher.setAutoPadding(true);
         cipherChunks.push(cipher.update(data, 'utf8', 'base64'));
         cipherChunks.push(cipher.final('base64'));
@@ -30,7 +29,7 @@ class Token {
 
     private decryption(data: string) {
         let cipherChunks = [];
-        let decipher = crypto.createDecipheriv('aes-128-ecb', this.key, this.iv);
+        let decipher = crypto.createDecipheriv('aes-128-cbc', this.key, this.iv);
         decipher.setAutoPadding(true);
         cipherChunks.push(decipher.update(data, 'base64', 'utf8'));
         cipherChunks.push(decipher.final('utf8'));

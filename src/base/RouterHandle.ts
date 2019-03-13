@@ -2,6 +2,8 @@ import * as core from 'express-serve-static-core';
 import * as path from 'path';
 import 'reflect-metadata';
 import { SetActionDescriptorMap, GetActionDescriptorMap, ActionDescriptor, ViewResult, ActionParamDescriptor, ResponseBase, LogicParam } from './BaseController';
+import Token from './Token';
+import UserService from '../service/UserService';
 
 function find(controllers: any) {
     const routerNameArr = Object.getOwnPropertyNames(controllers);
@@ -54,8 +56,16 @@ export function RouterHandle(app: core.Express, controllers: any) {
 export function Router(req: core.Request, res: core.Response, next: core.NextFunction) {
     if (res.locals.actionDes) {
         let actionDes: ActionDescriptor = res.locals.actionDes;
-        new Promise((resolve, reject) => {
+        new Promise(async (resolve, reject) => {
             let controller = new actionDes.controller(req, res);
+            if (actionDes.isAuth) {
+                let userInfo = await AuthLogin(req.headers.token as string);
+                if (userInfo) {
+                    controller.userInfo = userInfo;
+                } else {
+                    return resolve(new ResponseBase(401, '未登录'));
+                }
+            }
             let result = getActionLogic(req, actionDes.method, actionDes.controller, actionDes.actionName);
             if (result) {
                 resolve(result);
@@ -99,6 +109,30 @@ export function Router(req: core.Request, res: core.Response, next: core.NextFun
         (err as any).status = 404;
         next && next(err);
     }
+}
+
+
+/**
+ * 验证登录态
+ *
+ * @param {Boolean} isAuth
+ * @param {string} token
+ * @returns
+ */
+async function AuthLogin(token: string) {
+    if (token) {
+        let res = Token.ParseToken(token);
+        if (res && res.userId) {
+            let userInfo = await UserService.getUserInfoById(res.userId);
+            if (userInfo && (!res.expires || res.expires.getTime() > new Date().getTime() - 5 * 60 * 1000)) {
+                return {
+                    userId: userInfo.id,
+                    openId: userInfo.openId
+                };
+            }
+        }
+    }
+    return undefined;
 }
 
 const fromQueryMetadataKey = Symbol("fromQuery");

@@ -1,32 +1,42 @@
-import Request, { RequestResponse, CoreOptions, UrlOptions } from 'request';
-
-
-interface Options {
-    baseUrl?: string;
-    url?: string;
-    method?: string;
-    headers?: any;
-    timeout?: number;
-    querystring?: any;
-    data?: any,
-    keepAlive?: boolean;
-}
+const rp = require('request-promise');
 
 namespace HttpClient {
-    export function request(options: any) {
+    export function get(url = '', data = {}, options = {}) {
+        return request(url, 'GET', data, options);
+    }
+    export function post(url = '', data = {}, options = {}) {
+        return request(url, 'POST', data, options);
+    }
+    export function request(url = '', method = 'GET', data = {}, options: any = {}) {
         return new Promise((resolve, reject) => {
-            if (!options.baseUrl) {
-                reject('请求地址不正确');
+            if (!url) {
+                reject(['请求地址不正确']);
             }
-            Request(options, (err: any, response: RequestResponse, body: any) => {
-                if(err){
-                    
-                }
+            options = buildOptions(method, data, options);
+            options.uri = url;
+            rp(options).then((res: any) => {
+                resolve([null, res]);
+            }).catch((err: Error) => {
+                reject([err.message]);
             });
+        }).catch((err) => {
+            return err;
         });
     }
-    function buildOption(options: Options) {
-        let opt: CoreOptions & UrlOptions = { url: '' };
-        
-    }
 }
+function buildOptions(method = 'GET', data = {}, options: any = {}) {
+    Object.assign(options, {
+        json: true
+    });
+    options.method = method;
+    switch (method.toLowerCase()) {
+        case 'get':
+            options.qs = data;
+            break;
+        case 'post':
+            options.body = data;
+            break;
+    }
+    return options;
+}
+export default HttpClient;

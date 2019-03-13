@@ -4,6 +4,7 @@ import { SetActionArgsMetaData, SetActionLogicMetaData } from './RouterHandle';
 export class BaseController {
     public Request: core.Request;
     public Response: core.Response;
+    public userInfo: any;
     constructor(req: core.Request, res: core.Response) {
         this.Request = req;
         this.Response = res;
@@ -66,6 +67,18 @@ export function post() {
     }
 }
 
+/**
+ * 设置请求登录认证auth装饰器
+ *
+ * @export
+ * @returns
+ */
+export function auth() {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        SetActionDescriptorMap(target.constructor.name, propertyKey, undefined, undefined, true);
+    }
+}
+
 
 /**
  * 控制器方法参数定义类
@@ -117,13 +130,6 @@ function buildActionParamDes(fromType: string, target: any, actionName: string, 
     let paramDes = new ActionParamDescriptor();
     paramDes.paramName = paramName;
     paramDes.fromType = fromType;
-    // paramDes.verifyObject = new VerifyObject();
-    // paramDes.verifyObject.isRequired = isRequired;
-    // if (typeof paramType === 'string') {
-    //     paramDes.verifyObject.type = paramType;
-    // } else if (typeof paramType === 'object') {
-    //     paramDes.verifyObject = Object.assign(paramDes.verifyObject, paramType);
-    // }
     paramDes.target = target;
     paramDes.actionName = actionName;
     paramDes.index = index;
