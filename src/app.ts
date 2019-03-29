@@ -13,7 +13,7 @@ import { appConfigInterface } from './common/appConfig';
 const appConfig: appConfigInterface = require('../config/app.json');
 
 const app = express();
-
+//测试
 // const viewPath = path.join(path.parse(__dirname).dir, 'bin/views');
 // const publicPath = path.join(path.parse(__dirname).dir, 'dust');
 
