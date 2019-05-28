@@ -63,7 +63,7 @@ export function Router(req: core.Request, res: core.Response, next: core.NextFun
                 if (userInfo) {
                     controller.userInfo = userInfo;
                 } else {
-                    return resolve(cbResposeBase(401, '未登录'));
+                    return resolve(new ResponseBase(401, '未登录'));
                 }
             }
             let result = getActionLogic(req, actionDes.method, actionDes.controller, actionDes.actionName);
@@ -101,7 +101,7 @@ export function Router(req: core.Request, res: core.Response, next: core.NextFun
             } else if (typeof err === 'string') {
                 msg = err;
             }
-            res.send(cbResposeBase(6000, msg));
+            res.send(new ResponseBase(6000, msg));
             res.end();
         });
     } else {
@@ -202,7 +202,7 @@ function getActionLogic(req: core.Request, method: string, controller: any, acti
  * @param {string} msg
  * @returns
  */
-export function cbResposeBase(code: number, msg: string) {
+function cbResposeBase(code: number, msg: string) {
     return new ResponseBase(code, msg);
 }
 
